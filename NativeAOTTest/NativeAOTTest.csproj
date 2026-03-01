@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Output executable -->
+		<OutputType>Exe</OutputType>
+		<!-- Target .NET 10.0 -->
+		<TargetFramework>net10.0</TargetFramework>
+		<!-- Target both Windows x64 and Linux x64 -->
+		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- Enable Native AOT compilation (Outputs native compiled binary without needing .NET runtime on target system) -->
+		<PublishAot>true</PublishAot>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<!-- Allow unsafe code blocks for interop with native libraries -->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- Define properties to detect the current operating system -->
+		<IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+		<IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
+		<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Reference the appropriate native library based on the operating system for static linking (Windows) -->
+		<NativeLibrary Include="raylib.lib" Condition="'$(IsWindows)'=='true'" />
+		<!-- Reference the appropriate native library based on the operating system for static linking (Linux) -->
+		<NativeLibrary Include="raylib.a" Condition="'$(IsLinux)'=='true'" />
+		<!-- Allows calling native functions in raylib wihtout extra marshaling for better performance -->
+		<DirectPInvoke Include="raylib" />
+
+		<!-- Specicif linker arguments only for MSVC to properly statically link raylib -->
+		<LinkerArg Include="gdi32.lib kernel32.lib msvcrt.lib opengl32.lib raylib.lib shell32.lib user32.lib winmm.lib" Condition="'$(IsWindows)'=='true'" />
+		<LinkerArg Include="/NODEFAULTLIB:libcmt" Condition="'$(IsWindows)'=='true'" />
+	</ItemGroup>
+
+	<!-- For easy development and debugging just use .NET runtime + JIT and interop with dynamicly linked raylib -->
+	<ItemGroup>
+		<!-- Copy the appropriate dynamic library to the output directory for debugging (Windows) -->
+		<None Update="raylib.dll" Condition="'$(Configuration)' == 'Debug' And '$(IsWindows)'=='true'">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<!-- Copy the appropriate dynamic library to the output directory for debugging (Linux) -->
+		<None Update="raylib.so" Condition="'$(Configuration)' == 'Debug' And '$(IsLinux)'=='true'">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+</Project>
