@@ -234,4 +234,6 @@ To create your own Native AOT project with static linking:
 
 ## License
 
-This is a demonstration project. Raylib is licensed under the zlib license.
+This project is licensed under the **MIT License**. See the LICENSE file for details.
+
+Raylib (the graphics library used in this example) is licensed under the **zlib license**.
