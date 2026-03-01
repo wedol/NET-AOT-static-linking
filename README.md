@@ -38,6 +38,7 @@ C# Code → AOT Compilation (Roslyn) → Machine Code → Executable → Executi
 ### Benefits
 
 - ✅ **Smaller Distribution**: No need to ship the .NET runtime
+- ✅ **Compact Executable**: The resulting binary is only around **1.3 MB** with raylib statically linked
 - ✅ **Faster Startup**: No JIT compilation or runtime initialization
 - ✅ **Better Security**: Harder to reverse-engineer compared to managed IL
 - ✅ **Cross-Platform**: Can produce separate binaries for Windows, Linux, macOS, etc.
@@ -49,7 +50,10 @@ C# Code → AOT Compilation (Roslyn) → Machine Code → Executable → Executi
 - **.NET 10 SDK** or later installed
 - **Native development tools**:
   - **Windows**: Visual Studio Build Tools or MSVC compiler
-  - **Linux**: GCC or Clang
+  - **Linux**: Clang compiler and zlib development library
+    ```bash
+    sudo apt install clang zlib1g-dev
+    ```
 - **Raylib libraries**: Static library files (`raylib.lib` or `raylib.a`) in the project directory
 
 ### Compilation Steps
@@ -102,9 +106,11 @@ This uses the .NET runtime and dynamically loads `raylib.dll`/`raylib.so` instea
 ### Build Artifacts
 
 After publishing, the output directory contains:
-- `NativeAOTTest.exe` (Windows) or `NativeAOTTest` (Linux) - The main executable
+- `NativeAOTTest.exe` (Windows) or `NativeAOTTest` (Linux) - The main executable (~1.3 MB with statically linked raylib)
 - Various support files (DLLs, runtime files, etc.) for dependency resolution
 - The binary is fully self-contained for the published configuration
+
+The small executable size demonstrates the efficiency of Native AOT compilation combined with static linking - a complete graphics application in just over 1 MB!
 
 ## Static Linking with .NET
 
